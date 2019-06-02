@@ -1,30 +1,27 @@
 package com.example.android.demonhack;
 
-import android.content.Intent;
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.util.Random;
-
+import android.widget.Toast;
 
 public class Main2Activity extends AppCompatActivity {
     private EditText cv;
-    private TextView tt,te,lm;
-    private Button bt,btn;
+    private TextView tt,te,lm,re;
+    private Button btn;
     int d_age,actualAge;
     int no_of_tries = 0;
     int optimal_tries = 20;
-    int won = 0;
+     int won = 0;
     View view;
-    Random r = new Random();
-
-
-
+    int lose = 0;
+    SharedPreferences myPrefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,49 +32,66 @@ public class Main2Activity extends AppCompatActivity {
         te = (TextView)findViewById(R.id.textView6);
         btn = (Button)findViewById(R.id.button4);
         lm = (TextView)findViewById(R.id.textView7) ;
-        bt = (Button)findViewById(R.id.button2) ;
+        re = (TextView)findViewById(R.id.textView10) ;
         actualAge = Integer.parseInt(getIntent().getExtras().getString("value"));
 
-       btn.setOnClickListener(new View.OnClickListener() {
+        myPrefs = getSharedPreferences("prefID",Activity.MODE_PRIVATE);
+        won = myPrefs.getInt("wi",0);
+        lose = myPrefs.getInt("lo",0);
+        lm.setText(Integer.toString(won));
+
+        re.setText(Integer.toString(lose));
+        btn.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {no_of_tries++;
-           if(no_of_tries>optimal_tries){btn.setEnabled(false);}
+           if(no_of_tries>optimal_tries){Toast.makeText(getBaseContext(),"TRIALS OVER....",Toast.LENGTH_LONG).show();btn.setEnabled(false); }
            else{
                d_age = Integer.parseInt(cv.getText().toString());
+               if(d_age>actualAge){lose++;tt.setText("higher age");te.setText("cool......try again");
+                   myPrefs = getSharedPreferences("prefID",Activity.MODE_PRIVATE);
+                   SharedPreferences.Editor editor = myPrefs.edit();
+                   editor.putInt("lo",lose);
+                   editor.apply();
+                   lose = myPrefs.getInt("lo",0);
 
+                   re.setText(Integer.toString(lose));
 
-               if(d_age>actualAge){tt.setText("higher age");
-               te.setText("cool......try again");if(d_age-actualAge<=8){view.setBackgroundResource(R.color.green);
+                   if(d_age-actualAge<=8){view.setBackgroundColor(Color.rgb(50,205,50));
                    }
-                   else if(d_age-actualAge<=16){view.setBackgroundResource(R.color.lightG);}
-                   else if(d_age-actualAge<=24){view.setBackgroundResource(R.color.veryLR);}
-                   else if(d_age-actualAge<=32){view.setBackgroundResource(R.color.verLR);}
-                   else if(d_age-actualAge<=48){view.setBackgroundResource(R.color.lightR);}
-                   else {view.setBackgroundResource(R.color.red);}}
-               else if(d_age == actualAge){won++;
-                   actualAge = r.nextInt(100);
-                   tt.setText("CONGRATS!!!!!!!you guessed it correctly");
+                   else if(d_age-actualAge<=16){view.setBackgroundColor(Color.rgb(0,255,0));}
+                   else if(d_age-actualAge<=24){view.setBackgroundColor(Color.rgb(144,238,144));}
+                   else if(d_age-actualAge<=32){view.setBackgroundColor(Color.rgb(255,160,122));}
+                   else if(d_age-actualAge<=48){view.setBackgroundColor(Color.rgb(255,127,80));}
+                   else {view.setBackgroundColor(Color.rgb(255,0,0));}}
+               else if(d_age == actualAge){won++;tt.setText("CONGRATS!!!! you won");
                    te.setText("WOAHH");
-               view.setBackgroundResource(R.color.green);}
+                   myPrefs = getSharedPreferences("prefID",Activity.MODE_PRIVATE);
+                   SharedPreferences.Editor editor = myPrefs.edit();editor.putInt("wi",won);
+                   editor.apply();
+                   won = myPrefs.getInt("wi",0);
+                   lm.setText(Integer.toString(won));
+
+                   view.setBackgroundColor(Color.rgb(50,205,50));
+               }
                    else
-                   {tt.setText("lower age");
-                   te.setText("go ahead and try again......");if(actualAge-d_age<=8){view.setBackgroundResource(R.color.green);
+                   {lose++;tt.setText("lower age");
+                       te.setText("go ahead and try again......");
+                       myPrefs = getSharedPreferences("prefID",Activity.MODE_PRIVATE);
+                       SharedPreferences.Editor editor = myPrefs.edit();
+                       editor.putInt("lo",lose);
+                       editor.apply();
+
+                       lose = myPrefs.getInt("lo",0);
+
+                       re.setText(Integer.toString(lose));
+
+                       if(actualAge-d_age<=8){view.setBackgroundColor(Color.rgb(50,205,50));
                    }
-                   else if(actualAge-d_age<16){view.setBackgroundResource(R.color.lightG);}
-                   else if(actualAge-d_age<24){view.setBackgroundResource(R.color.veryLR);}
-                   else if(actualAge-d_age<32){view.setBackgroundResource(R.color.verLR);}
-                   else if(actualAge-d_age<48){view.setBackgroundResource(R.color.lightR);}
-                   else {view.setBackgroundResource(R.color.red);}}
+                   else if(actualAge-d_age<=16){view.setBackgroundColor(Color.rgb(0,255,0));}
+                   else if(actualAge-d_age<=24){view.setBackgroundColor(Color.rgb(144,238,144));}
+                   else if(actualAge-d_age<=32){view.setBackgroundColor(Color.rgb(255,160,122));}
+                   else if(actualAge-d_age<=48){view.setBackgroundColor(Color.rgb(255,127,80));}
+                   else {view.setBackgroundColor(Color.rgb(255,0,0));}}
 
-
-               }}
-
-       });bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {lm.setText(Integer.toString(won));
-
-
-            }
-        });
-
-}}
+               } }
+        }); }}
